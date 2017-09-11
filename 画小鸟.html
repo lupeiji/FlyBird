@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas width="800" height="600"></canvas>
+    <script src="js/sky.js"></script>
+    <script src="js/birds.js"></script>
+    <script src="js/Land.js"></script>
+    <script src="js/pipe.js"></script>
+    <script>
+        // 加载多张图片--封装
+        function loadImg(arr, callback) {
+            var count = 0;
+            var imgs = {};
+            for (var i = 0; i < arr.length; i++) {
+                var img = new Image();
+                img.src = "images/"+arr[i]+".png";
+                imgs[arr[i]] = img;
+                img.onload = function () {
+                    count++;
+                    if (count == arr.length) {
+                        callback(imgs);
+                    }
+                }
+            }
+        }
+
+
+        /*1.获取canvas标签*/
+        var c = document.querySelector("canvas");
+        /*2.获取上下文*/
+        var ctx = c.getContext("2d");
+        // var birdImg = new Image();
+        // birdImg.src = "images/birds.png";
+        // var index = 0;
+        // var birdImgY = 0;
+        // var canvasX = 100;
+        // var canvasY = 100;
+        // 小鸟下落的速度
+        // var birdSpeed = 0;
+        // 重力加速度
+        // var g = 0.0003;
+        /*设置小鸟的最大旋转角度*/
+        // var birdMaxAngle = 45;
+        /*设置小鸟的最大下落速度*/
+        // var birdMaxSpeed = 0.4;
+
+
+        loadImg(["birds", "sky","land","pipe1","pipe2"], function (aa) {
+            var birdImg = aa["birds"];
+            var skyImg = aa["sky"];
+            var landImg=aa["land"];
+            var pipeImgbottom=aa["pipe1"];
+            var pipeImgtop=aa["pipe2"];
+            /*重力加速度公式计算本次移动的距离
+            * var distanceY = 起始速度*时间 + g * 时间 * 时间 / 2
+            * 计算速度公式：
+            * var birdSpeed = 起始速度 +　g　*　时间*/
+            var startTime = new Date();
+            var endtime = 0;
+            var gameStartTime=new Date();
+            /*起始时间和本次结束时间*/
+            // var disantY=bidsSpeed*t+g*t*t*0.5;
+            // var birdImgW = birdImg.width / 3;
+            // var birdImgH = birdImg.height;
+
+                // var skyX1=0;
+                // var skyX2=skyImg.width;
+                //天空速度
+            //    var skySpeed=2;
+            var sky1=new sky(
+                {
+                    ctx:ctx,
+                    skyImg:skyImg,
+                    skyX:0,
+                }
+            );
+            var sky2=new sky(
+                {
+                    ctx:ctx,
+                    skyImg:skyImg,
+                    skyX:skyImg.width,
+                }
+            );
+            var bird=new birds(
+                {
+                    ctx:ctx,
+                    canvasX:100,
+                    canvasY:100,
+                    birdImg:birdImg
+                }
+            );
+            // 陆地对象
+            var lands=[];
+            for(var i=0;i<4;i++){
+                var land=new Land(
+                    {
+                        ctx:ctx,
+                        landImg:landImg,
+                        x:i*landImg.width,
+                        y:c.height-landImg.height,
+                    }
+                );
+                lands.push(land);
+            }
+            // 管道对象
+            var pipes=[];
+            for(var i=0;i<6;i++){
+                var pipe=new Pipe(
+                    {
+                        ctx:ctx,
+                        pipeImgbottom:pipeImgbottom,
+                        pipeImgtop:pipeImgtop,
+                        x:300+pipeImgtop.width*3*i,
+                    }
+                );
+                pipes.push(pipe);
+            }
+
+            function fly() {
+                var endtime = new Date();
+                var t = endtime - startTime;
+                // console.log(t);
+                startTime = endtime;
+                // var birdImgX = birdImgW * index;
+                // index++;
+                // // var distanceY = 起始速度*时间 + g * 时间 * 时间 / 2
+                // var disantY = birdSpeed * t + g * t * t * 0.5;
+                // // console.log(disantY);
+                // birdSpeed = birdSpeed + 　g 　* t;
+                // // console.log(birdSpeed);
+                // canvasY += disantY;
+                // /*计算小鸟下落过程中的旋转的角度值*/
+                // var currentAngle = birdSpeed * birdMaxAngle / birdMaxSpeed;
+                // if (currentAngle > 45) {
+                //     currentAngle = 45;
+                // }
+                /*清除画布内容：*/
+                ctx.clearRect(0, 0, c.width, c.height);
+                ctx.beginPath();
+                // 画天空
+                // if(skyX1<=(-skyImg.width)){
+                //     skyX1+=skyImg.width*2;
+                // }
+                // if(skyX2<=(-skyImg.width)){
+                //     skyX2+=skyImg.width*2;
+                // }
+                // skyX1-=skySpeed;
+                // skyX2-=skySpeed;
+                // ctx.drawImage(skyImg,skyX1,0);
+                // ctx.drawImage(skyImg,skyX2,0);
+
+                // ctx.save();
+                // ctx.translate(canvasX + 0.5 * birdImgW, canvasY + 0.5 * birdImgH);
+
+                // ctx.rotate(Math.PI / 180 * currentAngle);
+                // ctx.drawImage(birdImg, birdImgX, birdImgY, birdImgW, birdImgH, -0.5 * birdImgW, -0.5 * birdImgH, birdImgW, birdImgH);
+                // ctx.restore();
+
+                // if (index > 2) {
+                //     index = 0;
+                // }
+
+                // console.log(c.width-textWidth-10);
+                // 画天空
+                sky1.drawSky();
+                sky2.drawSky();
+
+                // 画小鸟
+                bird.drawBird(t);
+                // 画管道
+                for(var i=0;i<pipes.length;i++){
+                    var cc=pipes[i];
+                    cc.drawPipe();
+                }
+
+                // 计时器
+                var gameOvertime=new Date();
+                var dur=gameOvertime-gameStartTime;
+                var h=Math.floor(dur/1000/3600);
+                var min=Math.floor((dur-h*3600*1000)/1000/60);
+                var s=Math.floor((dur-h*3600*1000-min*60*1000)/1000);
+                var str="你坚持了"+h+"时"+min+"分"+s+"秒";
+                // console.log(str);
+                var textWidth=ctx.measureText(str).width;
+                ctx.textBaseline="top";
+                ctx.font="20px 黑体";
+                ctx.fillStyle="red";
+                ctx.fillText(str,c.width-textWidth-10,10);
+                
+                // 画陆地
+                for(var i=0;i<lands.length;i++){
+                     var bb=lands[i];
+                     bb.drawLand();
+                }
+                /*判断小鸟是否超出上下边界*/
+                // console.log(bird.canvasY);
+                if(bird.canvasY<0 ||bird.canvasY>c.height-lands[0].landImg.height-bird.birdImgH){
+                    var result=confirm("游戏结束，是否要重新开始");
+                    if(result){
+                         history.go(0);
+                        //  location=location;
+                    }
+                    return;
+                }
+
+            /*判断小鸟是否撞到管道*/
+            // console.log(birdImg.width);
+            // console.log(bird.canvasX + birdImg.width / 6);
+            // console.log(bird.canvasY + birdImg.height / 2);
+            if(ctx.isPointInPath(bird.canvasX + birdImg.width / 6,bird.canvasY + birdImg.height / 2)){
+                    var result=confirm("游戏结束，是否要重新开始");
+                    if(result){
+                         history.go(0);
+                        //  location=location;
+                    }
+
+                        //  location=location;
+                        // document.execCommand('Refresh');
+                        // location.reload() 
+                        // document.URL=location.href;
+
+                return;
+            }
+
+                window.requestAnimationFrame(fly);
+            }
+            fly();
+            c.onclick = function () {
+                bird.birdSpeed = -0.2;
+            }
+
+        });
+    </script>
+</body>
+
+</html>
